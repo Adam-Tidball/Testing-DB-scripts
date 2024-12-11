@@ -1,0 +1,12 @@
+{
+    "name": "example_date_script",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node example_date_script.js"
+    },
+    "dependencies": {
+        "sqlite3": "^5.1.7"
+    }
+}
