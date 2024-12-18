@@ -4,9 +4,11 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "start": "node example_date_script.js"
+        "start": "node example_date_script.js",
+        "start-api": "node mock_API.js"
     },
     "dependencies": {
+        "express": "^4.21.2",
         "sqlite3": "^5.1.7"
     }
 }

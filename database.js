@@ -11,8 +11,9 @@ db.serialize(() => {
   for (let i = 0; i < 5; i++) {
     let mockDate = new Date();
     mockDate.setFullYear(mockDate.getFullYear() - 1);
-    mockDate.setMonth(mockDate.getMonth() + i);
-    stmt.run(i + 1, mockDate.toISOString().split('T')[0], sports[i], teams[i]);
+    mockDate.setMonth(12); //0-11
+    mockDate.setDate(i%3);
+    stmt.run(i + 1, mockDate.toISOString().split('T')[0], sports[i%5], teams[i%5]);
   }
 
   stmt.finalize();

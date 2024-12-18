@@ -1,6 +1,25 @@
 import db from './database.js';
 import readline from 'readline';
 
+/* ALL DATA FUNCTIONS */
+function queryAllData() {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM mock_data", (err, rows) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+async function printAllData(){
+    const allData = await queryAllData();
+    console.log("All Data in Temp DB:");
+    console.log(allData, "\n");
+}
+
+/* SPECIFIC DAY QUERY FUNCTIONS */
 function queryDataByDate(date) {
   return new Promise((resolve, reject) => {
     db.all("SELECT * FROM mock_data WHERE date = ?", [date], (err, rows) => {
@@ -12,6 +31,31 @@ function queryDataByDate(date) {
   });
 }
 
+async function printDataByDate(date) {
+  const result = await queryDataByDate(date);
+  console.log("Query Result for date " + date + ":");
+  console.log(result, "\n");
+}
+
+/* SPECIFIC MONTH QUERY FUNCTIONS */
+function queryDataByMonth(startDate) {
+
+  // Set Start Date to first day of the month and End Date to first day of the next month
+  startDate = startDate.split('-').slice(0, 2).join('-') + '-01';
+  var endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(endDate.getDate() - 1);
+
+  return queryDataByStartDate(startDate, endDate.toISOString().split('T')[0]);
+}
+
+async function printDataByMonth(startDate) {
+  const result = await queryDataByMonth(startDate);
+  console.log("Query Result for month of date " + startDate + ":");
+  console.log(result, "\n");
+}
+
+/* DATE RANGE QUERY FUNCTIONS */
 function queryDataByStartDate(startDate, endDate) {
   return new Promise((resolve, reject) => {
     let query = "SELECT * FROM mock_data WHERE date >= ?";
@@ -31,6 +75,31 @@ function queryDataByStartDate(startDate, endDate) {
   });
 }
 
+async function printDataByStartDate(startDate, endDate) {
+  const result = await queryDataByStartDate(startDate, endDate);
+  console.log("Query Result for date range " + startDate + " to " + endDate + ":");
+  console.log(result, "\n");
+}
+
+/* DATE TO PRESENT QUERY FUNCTIONS */
+function queryDataFromDateToPresent(startDate) {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM mock_data WHERE date >= ?", [startDate], (err, rows) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+async function printDataFromDateToPresent(startDate) {
+  const result = await queryDataFromDateToPresent(startDate);
+  console.log("Query Result for date " + startDate + " to present:");
+  console.log(result, "\n");
+}
+
+/* HELPER FUNCTIONS */
 function printCurrentDate() {
   var date = new Date();
   var year = date.getFullYear();
@@ -67,19 +136,46 @@ function manualQuery() {
   });
 }
 
+/* API FUNCTIONS */
+async function GetOrgSessionsFromDateToPresent(startDate) {
+  
+  let currentDate = new Date(startDate);
+  const today = new Date();
+  const apiUrl = 'http://localhost:3000/data/';
+
+  while (currentDate <= today) {
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    //console.log("Fetching data for date:" + formattedDate);
+    const response = await fetch(apiUrl + formattedDate);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const responseData = await response.json();
+    if (responseData.data.length > 0) {
+      console.log(responseData);
+    }  
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+}
+
+
+/* MAIN FUNCTION */
 async function main() {
   printCurrentDate();
 
+  // Dates to query
+  const date1 = "2024-01-01";
+
   try {
-    const result1 = await queryDataByDate("2022-11-01");
-    console.log("Query Result for date 2022-11-01:");
-    console.log(result1, "\n");
-
-    const result2 = await queryDataByStartDate("2022-11-01", "2022-12-01");
-    console.log("Query Result for date range 2022-11-01 to 2022-12-01:");
-    console.log(result2, "\n");
-
-    manualQuery();
+    await printAllData();    
+    //await printDataByDate(date1);
+    //await printDataByMonth(date1);
+    //await printDataByStartDate(date1);
+    //await printDataFromDateToPresent(date1);
+    console.log("Fetching data from API...");
+    await GetOrgSessionsFromDateToPresent(date1);
+   
+    //manualQuery();
   } catch (err) {
     console.error("Error executing query:", err.message);
   }
