@@ -138,21 +138,27 @@ function manualQuery() {
 
 /* API FUNCTIONS */
 async function GetOrgSessionsFromDateToPresent(startDate) {
-  
+
+  const apiUrl = 'http://localhost:3000/data/';
+  const apiKey = 'example_api_key';
   let currentDate = new Date(startDate);
   const today = new Date();
-  const apiUrl = 'http://localhost:3000/data/';
 
   while (currentDate <= today) {
     const formattedDate = currentDate.toISOString().split('T')[0];
     //console.log("Fetching data for date:" + formattedDate);
-    const response = await fetch(apiUrl + formattedDate);
+    const response = await fetch(apiUrl + formattedDate, { 
+      headers: {
+        'Authorization': `Bearer ${apiKey}`, 
+        'Content-Type': 'application/json'
+      }
+    });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Request error! status: ${response.status}`);
     }
     const responseData = await response.json();
     if (responseData.data.length > 0) {
-      console.log(responseData);
+      console.log(responseData); // Print data to console for now
     }  
     currentDate.setDate(currentDate.getDate() + 1);
   }
