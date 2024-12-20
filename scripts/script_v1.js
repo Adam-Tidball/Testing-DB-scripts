@@ -30,7 +30,7 @@ async function callStatSportDateRangeAPI(startDate, endDate) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            thirdPartyApiId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            thirdPartyApiId: process.env.THIRD_PARTY_API_ID,
             sessionStartDate: startDate,
             sessionEndDate: endDate
         })
