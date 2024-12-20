@@ -1,0 +1,1 @@
+// TODO create a script that uses the API to fetch data and then stores in local cosmoDB

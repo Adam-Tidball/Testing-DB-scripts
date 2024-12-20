@@ -8,7 +8,10 @@
         "start-api": "node mock_API.js"
     },
     "dependencies": {
+        "@azure/cosmos": "^4.2.0",
+        "dotenv": "^16.4.7",
         "express": "^4.21.2",
+        "node-fetch": "^3.3.2",
         "sqlite3": "^5.1.7"
     }
 }
